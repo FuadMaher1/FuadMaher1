@@ -1,0 +1,593 @@
+SQL> set serveroutput on
+SQL> show user
+USER is "SYSTEM"
+SQL> connect hr_scheama
+ERROR:
+ORA-01045: user HR_SCHEAMA lacks CREATE SESSION privilege; logon denied 
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> connect system
+Connected.
+SQL> Grant resource, connect to hr_scheama;
+
+Grant succeeded.
+
+SQL> show user
+USER is "SYSTEM"
+SQL> connect hr_scheama
+Connected.
+SQL> CREATE TABLE employees_data (
+  2      emp_id    NUMBER PRIMARY KEY,
+  3      emp_name  VARCHAR2(50),
+  4      dept_name VARCHAR2(20),
+  5      salary    NUMBER
+  6  );
+
+Table created.
+
+SQL> INSERT INTO employees_data VALUES (1, 'Ahmed', 'HR', 9000);
+
+1 row created.
+
+SQL> INSERT INTO employees_data VALUES (2, 'Sara', 'SALES', 7000);
+
+1 row created.
+
+SQL> INSERT INTO employees_data VALUES (3, 'Khalid', 'SALES', 7500);
+
+1 row created.
+
+SQL> INSERT INTO employees_data VALUES (4, 'Laila', 'TECH', 8500);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> select * from employees_data;
+
+    EMP_ID EMP_NAME                                                             
+---------- --------------------------------------------------                   
+DEPT_NAME                SALARY                                                 
+-------------------- ----------                                                 
+         1 Ahmed                                                                
+HR                         9000                                                 
+                                                                                
+         2 Sara                                                                 
+SALES                      7000                                                 
+                                                                                
+         3 Khalid                                                               
+SALES                      7500                                                 
+                                                                                
+
+    EMP_ID EMP_NAME                                                             
+---------- --------------------------------------------------                   
+DEPT_NAME                SALARY                                                 
+-------------------- ----------                                                 
+         4 Laila                                                                
+TECH                       8500                                                 
+                                                                                
+
+SQL> connect system
+Connected.
+SQL> create user hr_manager identified by hr_manager;
+
+User created.
+
+SQL> create user sales_user identified by sales_user;
+
+User created.
+
+SQL> create user tech_user identified by tech_user;
+
+User created.
+
+SQL> GRANT CREATE SESSION TO hr_manager, sales_user, tech_user;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON hr_schema.employees_data TO hr_manager, sales_user, tech_user;
+GRANT SELECT ON hr_schema.employees_data TO hr_manager, sales_user, tech_user
+                          *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> GRANT SELECT ON hr_scheama.employees_data TO hr_manager, sales_user, tech_user;
+
+Grant succeeded.
+
+SQL> show user
+USER is "SYSTEM"
+SQL> connect hr_scheama
+Connected.
+SQL> CREATE OR REPLACE FUNCTION get_user_dept_predicate (
+  2      schema_p IN VARCHAR2,
+  3      table_p  IN VARCHAR2
+  4  ) RETURN VARCHAR2
+  5  IS
+  6      v_user VARCHAR2(30);
+  7  BEGIN
+  8      v_user := SYS_CONTEXT('USERENV', 'SESSION_USER');
+  9  
+ 10      IF v_user = 'HR_MANAGER' THEN
+ 11          RETURN '1=1'; -- No restriction    ELSIF v_user = 'SALES_USER' THEN
+ 12          RETURN 'DEPT_NAME = ''SALES''';
+ 13      ELSIF v_user = 'TECH_USER' THEN
+ 14          RETURN 'DEPT_NAME = ''TECH''';
+ 15      ELSE
+ 16          RETURN '1=2'; -- Deny access    END IF;
+ 17  END;
+ 18  /
+
+Warning: Function created with compilation errors.
+
+SQL> CREATE OR REPLACE FUNCTION get_user_dept_predicate (
+  2      schema_p IN VARCHAR2,
+  3      table_p  IN VARCHAR2
+  4  ) RETURN VARCHAR2
+  5  IS
+  6      v_user VARCHAR2(30);
+  7  BEGIN
+  8      v_user := SYS_CONTEXT('USERENV', 'SESSION_USER');
+  9  
+ 10      IF v_user = 'HR_MANAGER' THEN
+ 11          RETURN '1=1'; -- No restriction    ELSIF v_user = 'SALES_USER' THEN
+ 12          RETURN 'DEPT_NAME = ''SALES''';
+ 13      ELSIF v_user = 'TECH_USER' THEN
+ 14          RETURN 'DEPT_NAME = ''TECH''';
+ 15      ELSE
+ 16          RETURN '1=2'; -- Deny access    END IF;
+ 17  END;
+ 18  
+ 19  /
+
+Warning: Function created with compilation errors.
+
+SQL> CREATE OR REPLACE FUNCTION get_user_dept_predicate (
+  2      schema_p IN VARCHAR2,
+  3      table_p  IN VARCHAR2
+  4  ) RETURN VARCHAR2
+  5  IS
+  6      v_user VARCHAR2(30);
+  7  BEGIN
+  8      v_user := SYS_CONTEXT('USERENV', 'SESSION_USER');
+  9  
+ 10      IF v_user = 'HR_MANAGER' THEN
+ 11          RETURN '1=1'; -- No restriction    ELSIF v_user = 'SALES_USER' THEN
+ 12          RETURN 'DEPT_NAME = ''SALES''';
+ 13      ELSIF v_user = 'TECH_USER' THEN
+ 14          RETURN 'DEPT_NAME = ''TECH''';
+ 15      ELSE
+ 16          RETURN '1=2'; -- Deny access    END IF;
+ 17  END;
+ 18  /
+
+Warning: Function created with compilation errors.
+
+SQL> CREATE OR REPLACE FUNCTION get_user_dept_predicate (
+  2      schema_p IN VARCHAR2,
+  3      table_p  IN VARCHAR2
+  4  ) RETURN VARCHAR2
+  5  IS
+  6      v_user VARCHAR2(30);
+  7  BEGIN
+  8      v_user := SYS_CONTEXT('USERENV', 'SESSION_USER');
+  9  
+ 10      IF v_user = 'HR_MANAGER' THEN
+ 11          RETURN '1=1';
+ 12      ELSIF v_user = 'SALES_USER' THEN
+ 13          RETURN 'DEPT_NAME = ''SALES''';
+ 14      ELSIF v_user = 'TECH_USER' THEN
+ 15          RETURN 'DEPT_NAME = ''TECH''';
+ 16      ELSE
+ 17          RETURN '1=2';
+ 18      END IF;
+ 19  END;
+ 20  /
+
+Function created.
+
+SQL> BEGIN
+  2           DBMS_RLS.ADD_POLICY (
+  3               object_schema   => 'HR_SCHEMA',
+  4               object_name     => 'EMPLOYEES_DATA',
+  5               policy_name     => 'dept_security_policy',
+  6               function_schema => 'HR_SCHEMA',
+  7               policy_function => 'get_user_dept_predicate',
+  8               statement_types => 'SELECT'
+  9           );
+ 10       END;
+ 11  /
+         DBMS_RLS.ADD_POLICY (
+         *
+ERROR at line 2:
+ORA-06550: line 2, column 10: 
+PLS-00201: identifier 'DBMS_RLS' must be declared 
+ORA-06550: line 2, column 10: 
+PL/SQL: Statement ignored 
+
+
+SQL> connect system/fuad AS DBA
+SP2-0306: Invalid option.
+Usage: CONN[ECT] [{logon|/|proxy} [AS {SYSDBA|SYSOPER|SYSASM}] [edition=value]]
+where <logon> ::= <username>[/<password>][@<connect_identifier>]
+      <proxy> ::= <proxyuser>[<username>][/<password>][@<connect_identifier>]
+SQL> connect system
+Connected.
+SQL> GRANT EXECUTE ON DBMS_RLS TO hr_schema;
+GRANT EXECUTE ON DBMS_RLS TO hr_schema
+                 *
+ERROR at line 1:
+ORA-01031: insufficient privileges 
+
+
+SQL> connect hr_scheama
+Connected.
+SQL> show user
+USER is "HR_SCHEAMA"
+SQL> connect system/fuad as SYSDBA;
+Connected.
+SQL> GRANT EXECUTE ON DBMS_RLS TO hr_schema;
+GRANT EXECUTE ON DBMS_RLS TO hr_schema
+                             *
+ERROR at line 1:
+ORA-01917: user or role 'HR_SCHEMA' does not exist 
+
+
+SQL> GRANT EXECUTE ON DBMS_RLS TO hr_scheama;
+
+Grant succeeded.
+
+SQL> connect hr_sheama;
+ERROR:
+ORA-01017: invalid username/password; logon denied 
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> show user
+USER is ""
+SQL> connect hr_scheama
+Connected.
+SQL> GRANT EXECUTE ON DBMS_RLS TO hr_schema;
+GRANT EXECUTE ON DBMS_RLS TO hr_schema
+                 *
+ERROR at line 1:
+ORA-01031: insufficient privileges 
+
+
+SQL> BEGIN
+  2           DBMS_RLS.ADD_POLICY (
+  3               object_schema   => 'HR_SCHEMA',
+  4               object_name     => 'EMPLOYEES_DATA',
+  5               policy_name     => 'dept_security_policy',
+  6               function_schema => 'HR_SCHEMA',
+  7               policy_function => 'get_user_dept_predicate',
+  8               statement_types => 'SELECT'
+  9           );
+ 10       END;
+ 11  /
+BEGIN
+*
+ERROR at line 1:
+ORA-01918: user 'HR_SCHEMA' does not exist 
+ORA-06512: at "SYS.DBMS_RLS", line 20 
+ORA-06512: at line 2 
+
+
+SQL> BEGIN
+  2           DBMS_RLS.ADD_POLICY (
+  3               object_schema   => 'HR_SCHEAMA',
+  4               object_name     => 'EMPLOYEES_DATA',
+  5               policy_name     => 'dept_security_policy',
+  6               function_schema => 'HR_SCHEAMA',
+  7               policy_function => 'get_user_dept_predicate',
+  8               statement_types => 'SELECT'
+  9           );
+ 10       END;
+ 11  /
+
+PL/SQL procedure successfully completed.
+
+SQL> show user
+USER is "HR_SCHEAMA"
+SQL> connect hr_manager
+Connected.
+SQL> show user
+USER is "HR_MANAGER"
+SQL> select * from hr_scheam.employees.data;
+select * from hr_scheam.employees.data
+                                 *
+ERROR at line 1:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> select
+  2  /
+select
+     *
+ERROR at line 1:
+ORA-00936: missing expression 
+
+
+SQL> select * from hr_scheam.employees_data;
+select * from hr_scheam.employees_data
+                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> connect hr_manager;
+Connected.
+SQL> desc employees_data;
+ERROR:
+ORA-04043: object employees_data does not exist 
+
+
+SQL> select table_name from user_tables;
+
+no rows selected
+
+SQL> CREATE TABLE employees_data (
+  2      emp_id    NUMBER,
+  3      emp_name  VARCHAR2(50),
+  4      dept_name VARCHAR2(20),
+  5      salary    NUMBER
+  6  );
+CREATE TABLE employees_data (
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges 
+
+
+SQL> show user
+USER is "HR_MANAGER"
+SQL> connect hr_scheama
+Connected.
+SQL> show table_name from user_tables;
+SP2-0158: unknown SHOW option "table_name"
+SP2-0158: unknown SHOW option "from"
+USER is "HR_SCHEAMA"
+SP2-0158: unknown SHOW option "_tables"
+SQL> select table_name from user_tables;
+
+TABLE_NAME                                                                      
+------------------------------                                                  
+EMPLOYEES_DATA                                                                  
+
+SQL> connect hr_manager
+ERROR:
+ORA-01017: invalid username/password; logon denied 
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> connect hr_manager
+ERROR:
+ORA-01017: invalid username/password; logon denied 
+
+
+SQL> connect hr_manager
+Connected.
+SQL> select * from hr_scheam.EMPLOYEES_DATA;
+select * from hr_scheam.EMPLOYEES_DATA
+                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> connect sales_user
+Connected.
+SQL> select * from hr_scheam.employees_data;
+select * from hr_scheam.employees_data
+                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> connect hr_scheama;
+Connected.
+SQL> select table_name from user_tables;
+
+TABLE_NAME                                                                      
+------------------------------                                                  
+EMPLOYEES_DATA                                                                  
+
+SQL> desc employees_data;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ EMP_ID                                    NOT NULL NUMBER
+ EMP_NAME                                           VARCHAR2(50)
+ DEPT_NAME                                          VARCHAR2(20)
+ SALARY                                             NUMBER
+
+SQL> connect system
+Connected.
+SQL> connect system/fuad as SYSDBA;
+Connected.
+SQL> CREATE USER hr_manager IDENTIFIED BY hr_manager;
+CREATE USER hr_manager IDENTIFIED BY hr_manager
+            *
+ERROR at line 1:
+ORA-01920: user name 'HR_MANAGER' conflicts with another user or role name 
+
+
+SQL> CREATE or replace USER hr_manager IDENTIFIED BY hr_manager;
+CREATE or replace USER hr_manager IDENTIFIED BY hr_manager
+                  *
+ERROR at line 1:
+ORA-00922: missing or invalid option 
+
+
+SQL> drop user hr_manager cascade;
+
+User dropped.
+
+SQL> 
+SQL> 
+SQL> drop user sales_user cascade;
+
+User dropped.
+
+SQL> drop user tech_user cascade;
+
+User dropped.
+
+SQL> show user
+USER is "SYS"
+SQL> CREATE USER hr_manager IDENTIFIED BY hr_manager;
+
+User created.
+
+SQL> CREATE USER sales_user IDENTIFIED BY sales_user;
+
+User created.
+
+SQL> CREATE USER tech_user IDENTIFIED BY tech_user;
+
+User created.
+
+SQL> GRANT CREATE SESSION TO hr_manager, sales_user, tech_user;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON hr_scheama.employees_data TO hr_manager, sales_user, tech_user;
+
+Grant succeeded.
+
+SQL> show user;
+USER is "SYS"
+SQL> connect hr_manager;
+Connected.
+SQL> show user
+USER is "HR_MANAGER"
+SQL> select * from hr_scheam.employees_data;
+select * from hr_scheam.employees_data
+                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> connect sales_user
+Connected.
+SQL> select * from hr_scheam.employees_data;
+select * from hr_scheam.employees_data
+                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> connect hr_scheam
+ERROR:
+ORA-01017: invalid username/password; logon denied 
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> connect hr_scheama;
+Connected.
+SQL> select table_name from user_table;
+select table_name from user_table
+                       *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> select table_name from user_tables;
+
+TABLE_NAME                                                                      
+------------------------------                                                  
+EMPLOYEES_DATA                                                                  
+
+SQL> show user
+USER is "HR_SCHEAMA"
+SQL> GRANT SELECT ON hr_schema.employees_data TO hr_manager, sales_user, tech_user;
+GRANT SELECT ON hr_schema.employees_data TO hr_manager, sales_user, tech_user
+                          *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> GRANT SELECT ON hr_scheama.employees_data TO hr_manager, sales_user, tech_user;
+
+Grant succeeded.
+
+SQL> show user
+USER is "HR_SCHEAMA"
+SQL> connect hr_manager/hr_manager
+Connected.
+SQL> select * from hr_scheam.employees_data;
+select * from hr_scheam.employees_data
+                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> SELECT * FROM hr_schema.employees_data;
+SELECT * FROM hr_schema.employees_data
+                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> SELECT * FROM hr_schema.employees_data;
+SELECT * FROM hr_schema.employees_data
+                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> SELECT * FROM hr_scheama.employees_data;
+
+    EMP_ID EMP_NAME                                                             
+---------- --------------------------------------------------                   
+DEPT_NAME                SALARY                                                 
+-------------------- ----------                                                 
+         1 Ahmed                                                                
+HR                         9000                                                 
+                                                                                
+         2 Sara                                                                 
+SALES                      7000                                                 
+                                                                                
+         3 Khalid                                                               
+SALES                      7500                                                 
+                                                                                
+
+    EMP_ID EMP_NAME                                                             
+---------- --------------------------------------------------                   
+DEPT_NAME                SALARY                                                 
+-------------------- ----------                                                 
+         4 Laila                                                                
+TECH                       8500                                                 
+                                                                                
+
+SQL> show user
+USER is "HR_MANAGER"
+SQL> connect sales_user/sales_user;
+Connected.
+SQL> SELECT * FROM hr_scheama.employees_data;
+
+    EMP_ID EMP_NAME                                                             
+---------- --------------------------------------------------                   
+DEPT_NAME                SALARY                                                 
+-------------------- ----------                                                 
+         2 Sara                                                                 
+SALES                      7000                                                 
+                                                                                
+         3 Khalid                                                               
+SALES                      7500                                                 
+                                                                                
+
+SQL> connect tech_user/tech_user;
+Connected.
+SQL> SELECT * FROM hr_scheama.employees_data;
+
+    EMP_ID EMP_NAME                                                             
+---------- --------------------------------------------------                   
+DEPT_NAME                SALARY                                                 
+-------------------- ----------                                                 
+         4 Laila                                                                
+TECH                       8500                                                 
+                                                                                
+
+SQL> spool off

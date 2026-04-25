@@ -1,0 +1,84 @@
+
+ 
+ 
+
+   -- Create the scheama 
+   --CONNECT as SYSDBA or a privileged user to create HR_SCHEAMA
+  -- CREATE USER hr_scheama IDENTIFIED BY hr_password;
+  -- GRANT CONNECT, RESOURCE TO hr_scheama;
+ -- GRANT EXECUTE ON DBMS_RLS TO hr_scheama;
+
+  -- Switch to HR_SCHEAMA
+CONNECT hr_scheama/hr_password;
+
+   Create the employees_data table
+CREATE TABLE employees_data (
+    emp_id    NUMBER PRIMARY KEY,
+    emp_name  VARCHAR2(50),
+    dept_name VARCHAR2(20),
+    salary    NUMBER
+);
+
+  Insert sample data
+INSERT INTO employees_data VALUES (1, 'Ahmed', 'HR', 9000);
+INSERT INTO employees_data VALUES (2, 'Sara', 'SALES', 7000);
+INSERT INTO employees_data VALUES (3, 'Khalid', 'SALES', 7500);
+INSERT INTO employees_data VALUES (4, 'Laila', 'TECH', 8500);
+COMMIT;
+
+  Create users for testing
+ Run as SYSDBA or DBA user
+  CREATE USER hr_manager IDENTIFIED BY hr_manager;
+  CREATE USER sales_user IDENTIFIED BY sales_user;
+ CREATE USER tech_user IDENTIFIED BY tech_user;
+
+  Grant privileges
+  GRANT CREATE SESSION TO hr_manager, sales_user, tech_user;
+  GRANT SELECT ON hr_scheama.employees_data TO hr_manager, sales_user, tech_user;
+
+  Create the security policy function
+CREATE OR REPLACE FUNCTION get_user_dept_predicate (
+    scheama_p IN VARCHAR2,
+    table_p  IN VARCHAR2
+) RETURN VARCHAR2 
+IS
+    v_user VARCHAR2(30);
+BEGIN
+    v_user := SYS_CONTEXT('USERENV', 'SESSION_USER');
+    
+    IF v_user = 'HR_MANAGER' THEN
+        RETURN '1=1'; -- No restriction
+    ELSIF v_user = 'SALES_USER' THEN
+        RETURN 'DEPT_NAME = ''SALES''';
+    ELSIF v_user = 'TECH_USER' THEN
+        RETURN 'DEPT_NAME = ''TECH''';
+    ELSE
+        RETURN '1=2'; -- Deny access
+    END IF;
+END;
+/
+ 
+
+ -- Attach the policy using DBMS_RLS
+BEGIN
+    DBMS_RLS.ADD_POLICY (
+        object_schema   => 'HR_SCHEAMA', 
+        object_name     => 'EMPLOYEES_DATA',
+        policy_name     => 'dept_security_policy',
+        function_schema => 'HR_SCHEAMA',
+        policy_function => 'get_user_dept_predicate',
+        statement_types => 'SELECT'
+    );
+END;
+/
+***************************************
+-- Testing
+****************************************
+   CONNECT hr_manager/hr_manager;
+  SELECT * FROM hr_scheama.employees_data; -- Should see all rows
+
+  CONNECT sales_user/sales_user;
+  SELECT * FROM hr_scheama.employees_data; -- Should see only SALES rows
+
+ CONNECT tech_user/tech_user;
+  SELECT * FROM hr_scheama.employees_data; -- Should see only TECH rows
