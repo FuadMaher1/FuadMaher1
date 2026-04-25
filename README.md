@@ -15,7 +15,7 @@ i am stydying CyberSecurity, at thired Level !
 ## 🚀 How to Run the Project
 1. Download or clone the project
 2. Open `index.html` in your browser
-3.Or I will simply send you the link of witch project you want, so you can past it on your browser search box and
+3. Or I will simply send you the link of witch project you want, so you can past it on your browser search box and
 , it will run automaticaly .
 
 ## 📸 Screenshots
