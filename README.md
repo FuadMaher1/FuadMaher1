@@ -1,19 +1,22 @@
 # My Portfolio
 
 ## 📌 Description
-This is a short description for My portfolio on Github which contains My Porjects As a student at UCAS 
-studying CyberSecurity, thired Level !
+This is a short description for My portfolio on Github which contains My Porjects As a student at UCAS where
+i am stydying CyberSecurity, at thired Level !
+ 
 
 ## 🛠️ Technologies Used
 - HTML
 - CSS
 - JavaScript
-- (add whatever you used)
+- Oracle DataBase
+- Networks (Packet Tracer) 
 
 ## 🚀 How to Run the Project
 1. Download or clone the project
 2. Open `index.html` in your browser
-3. (add any other steps)
+3.Or I will simply send you the link of witch project you want, so you can past it on your browser search box and
+, it will run automaticaly .
 
 ## 📸 Screenshots
 ![Screenshot](screenshot.png)
