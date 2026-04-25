@@ -1,7 +1,8 @@
 # My Portfolio
 
 ## 📌 Description
-This is a short description for My portfolio on Github which contain My Porjects As a student 
+This is a short description for My portfolio on Github which contains My Porjects As a student at UCAS 
+studying CyberSecurity, thired Level !
 
 ## 🛠️ Technologies Used
 - HTML
@@ -18,9 +19,9 @@ This is a short description for My portfolio on Github which contain My Porjects
 ![Screenshot](screenshot.png)
 
 ## 👤 Author
-- Name: Your Name
-- GitHub: [your-username](https://github.com/your-username)
-- Email: your@email.com
+- Name: Fuad Maher
+- GitHub: [FuadMaher1](https://github.com/FuadMaher1)
+- Email: fuadalsersawy.iug@gmail.com
 
 ## 📄 License
 This project is open source and free to use.
