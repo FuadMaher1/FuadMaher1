@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camp Administration Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="responsive.css">
+</head>
+<body>
+    <div id="auth-check"></div>
+    <header>
+        <h1>Al-Saraa Camp Administration</h1>
+        <div class="user-info">
+            <span>Admin: <span id="admin-name">Administrator</span></span>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </header>
+
+    <main>
+        <nav>
+            <button id="persons-btn" class="nav-btn active">Displaced Persons</button>
+            <button id="add-person-btn" class="nav-btn">Add New Person</button>
+            <button id="stats-btn" class="nav-btn">Statistics</button>
+        </nav>
+
+        <section id="persons-section" class="content-section active">
+            <h2>Displaced Persons Records</h2>
+            <div class="search-filter">
+                <input type="text" id="search-input" placeholder="Search by name or tent number...">
+                <button id="search-btn" class="btn-primary">Search</button>
+                <select id="filter-select">
+                    <option value="all">All Persons</option>
+                    <option value="family">Families</option>
+                    <option value="individuals">Individuals</option>
+                </select>
+            </div>
+            <div id="persons-list" class="persons-grid">
+                <!-- Person cards will be inserted here by JavaScript -->
+            </div>
+        </section>
+
+        <section id="add-person-section" class="content-section">
+            <h2>Add New Displaced Person</h2>
+            <form id="add-person-form">
+                <div class="form-group">
+                    <label for="full-name">Full Name:</label>
+                    <input type="text" id="full-name" name="full-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" min="0" max="120" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="family-size">Family Size:</label>
+                    <input type="number" id="family-size" name="family-size" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="tent-number">Tent Number:</label>
+                    <input type="text" id="tent-number" name="tent-number" required>
+                </div>
+                <div class="form-group">
+                    <label for="arrival-date">Arrival Date:</label>
+                    <input type="date" id="arrival-date" name="arrival-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="health-status">Health Status:</label>
+                    <select id="health-status" name="health-status">
+                        <option value="">Not Specified</option>
+                        <option value="good">Good</option>
+                        <option value="fair">Fair</option>
+                        <option value="poor">Poor</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="special-needs">Special Needs:</label>
+                    <textarea id="special-needs" name="special-needs" rows="3" placeholder="Describe any special needs..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes:</label>
+                    <textarea id="notes" name="notes" rows="3" placeholder="Additional notes..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Add Person</button>
+                <button type="button" id="cancel-add-btn" class="btn-secondary">Cancel</button>
+            </form>
+        </section>
+
+        <section id="stats-section" class="content-section">
+            <h2>Camp Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Persons</h3>
+                    <p id="total-persons">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Families</h3>
+                    <p id="total-families">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Individuals</h3>
+                    <p id="total-individuals">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Age</h3>
+                    <p id="avg-age">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Occupied Tents</h3>
+                    <p id="occupied-tents">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Recent Arrivals (7 days)</h3>
+                    <p id="recent-arrivals">0</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="storage.js"></script>
+    <script src="personModel.js"></script>
+    <script src="ui.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
